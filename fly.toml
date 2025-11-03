@@ -1,0 +1,14 @@
+app = "ec-minio"
+primary_region = "sin"
+
+[env]
+MINIO_ROOT_USER = "minioadmin"
+MINIO_ROOT_PASSWORD = "minioadmin"
+
+[[services]]
+  internal_port = 9000
+  processes = ["app"]
+  protocol = "tcp"
+  [[services.ports]]
+    port = 9000
+    handlers = ["tls", "http"]
