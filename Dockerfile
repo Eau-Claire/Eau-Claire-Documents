@@ -1,16 +1,12 @@
-# Sử dụng image chính thức của MinIO
-FROM minio/minio:latest
+FROM minio/minio:latest AS minio
 
-# Đặt thư mục làm việc
-WORKDIR /data
+FROM nginx:latest
 
-# Thiết lập biến môi trường
-ENV MINIO_ROOT_USER=minioadmin \
-    MINIO_ROOT_PASSWORD=minioadmin
+COPY --from=minio /usr/bin/minio /usr/bin/minio
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Mở port 9000 (API) và 9001 (Console)
-EXPOSE 9000 9001
+RUN mkdir /data
+ENV MINIO_ROOT_USER=minioadmin
+ENV MINIO_ROOT_PASSWORD=minioadmin
 
-# Command mặc định khi container chạy
-ENTRYPOINT ["minio"]
-CMD ["server", "/data", "--console-address", ":9001"]
+CMD minio server /data --console-address ":9001" & nginx -g 'daemon off;'
